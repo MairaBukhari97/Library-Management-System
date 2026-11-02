@@ -1,32 +1,35 @@
-# Library Management System (Java)
+# Library Management System
 
-A console-based Library Management System built to practice and demonstrate core **object-oriented programming** concepts in Java: encapsulation, inheritance, abstraction, polymorphism, and custom exceptions.
+A console-based Library Management System built using Java to practice and demonstrate core **Object-Oriented Programming (OOP)** concepts, including encapsulation, inheritance, abstraction, polymorphism, and custom exceptions.
 
-Two roles log in and see different menus:
+The application has two user roles, each with different permissions and menus:
 
-| Role | Can do |
-|------|--------|
-| **Librarian** | Add and remove books, issue/return books on behalf of a member, search and browse |
-| **Member** | Search and browse, borrow and return books for **their own account**, view their borrowed books |
+| Role          | Functionality                                                                                |
+| ------------- | -------------------------------------------------------------------------------------------- |
+| **Librarian** | Add and remove books, issue and return books on behalf of members, search and browse books   |
+| **Member**    | Search and browse books, borrow and return books from their own account, view borrowed books |
 
-- The app first asks whether you are a **Librarian** or a **Member**, then offers **Log in / Sign up / Back**. Logging in only works with an ID of the chosen role.
-- Anyone can **sign up**. IDs are generated automatically (`M1`, `M2`, ... for members and `L1`, `L2`, ... for librarians), so duplicates are impossible.
-- Signing up as a librarian requires a **staff access code** (`STAFF_CODE` in `Main`), so only staff can get the catalog-management permissions.
-- Every member has the same borrow limit (`Member.BORROW_LIMIT`, currently 3).
+### How the application works
 
-## OOP concepts used
+* The application first asks the user to choose between Librarian and Member.
+* Users can log in, sign up, or go back.
+* User IDs are generated automatically (`M1`, `M2`, etc. for members and `L1`, `L2`, etc. for librarians).
+* Creating a librarian account requires a staff access code defined in `Main.java`.
+* Every member has the same borrowing limit, defined by `Member.BORROW_LIMIT` (currently 3 books).
 
-| Concept | Where |
-|---------|-------|
-| **Encapsulation** | Private fields with getters in `Book`, `Member`, `User`. `Member.getBorrowedBooks()` and `Library.getBooks()` return copies so callers can't modify internal lists. |
-| **Inheritance** | `Member` and `Librarian` both extend `User`. |
-| **Abstraction** | `User` is abstract and declares `getRole()` and `showMenu(Library)` without implementing them. |
-| **Polymorphism** | `Main` calls `user.showMenu(library)` and Java runs the Librarian or Member menu at runtime. There are no `if (role == ...)` checks. |
-| **Access control by type** | `Library.addBook` and `removeBook` require a `Librarian` parameter, so a `Member` cannot call them (compile-time error). |
-| **Composition / association** | `Library` has books and members; `Member` has borrowed books. |
-| **Custom exceptions** | `BookNotAvailableException`, `BorrowLimitExceededException` (checked exceptions). |
+## OOP Concepts Used
 
-## UML class diagram
+| Concept                       | Implementation                                                                                                                                       |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Encapsulation**             | Private fields with getters in `Book`, `Member`, and `User`. Defensive copies are returned by methods such as `getBorrowedBooks()` and `getBooks()`. |
+| **Inheritance**               | `Member` and `Librarian` extend the abstract `User` class.                                                                                           |
+| **Abstraction**               | `User` is an abstract class that defines `getRole()` and `showMenu(Library)`.                                                                        |
+| **Polymorphism**              | The application calls `user.showMenu(library)`, and Java executes the appropriate method depending on the actual user object.                        |
+| **Access Control**            | Methods for adding and removing books require a `Librarian` object.                                                                                  |
+| **Composition / Association** | The library manages books and registered users, while members maintain their borrowed books.                                                         |
+| **Custom Exceptions**         | `BookNotAvailableException` and `BorrowLimitExceededException` handle specific borrowing errors.                                                     |
+
+## UML Class Diagram
 
 ```mermaid
 classDiagram
@@ -76,8 +79,6 @@ classDiagram
         +findLibrarian(String) Librarian
         +findUser(String) User
     }
-    class BookNotAvailableException
-    class BorrowLimitExceededException
 
     User <|-- Member
     User <|-- Librarian
@@ -86,69 +87,108 @@ classDiagram
     Library "1" o-- "*" Librarian : registers
     Member "1" --> "0..*" Book : borrows
     Librarian ..> Library : manages catalog
-    Library ..> BookNotAvailableException : throws
-    Library ..> BorrowLimitExceededException : throws
 ```
 
-## Project structure
+## Project Structure
 
-```
-library-management-system/
+```text
+Library-Management-System/
 ├── pom.xml
 ├── README.md
+├── .gitignore
 └── src/
-    ├── main/java/
-    │   ├── Main.java            # role selection, log in, sign up
-    │   ├── User.java            # abstract base class
-    │   ├── Member.java
-    │   ├── Librarian.java
-    │   ├── Library.java         # core logic and permissions
-    │   ├── Book.java
-    │   ├── Console.java         # input helper
-    │   ├── BookNotAvailableException.java
-    │   └── BorrowLimitExceededException.java
-    └── test/java/
-        ├── LibraryTest.java
-        └── UserPolymorphismTest.java
+    ├── main/
+    │   └── java/
+    │       ├── Main.java
+    │       ├── User.java
+    │       ├── Member.java
+    │       ├── Librarian.java
+    │       ├── Library.java
+    │       ├── Book.java
+    │       ├── Console.java
+    │       ├── BookNotAvailableException.java
+    │       └── BorrowLimitExceededException.java
+    └── test/
+        └── java/
+            ├── LibraryTest.java
+            └── UserPolymorphismTest.java
 ```
 
-## Running the project
+## Technologies Used
 
-**Requirements:** Java 17+ (and Maven for tests).
+* **Java 17** – Application development
+* **Maven** – Project build and dependency management
+* **JUnit 5** – Unit testing
 
-Without Maven:
+## Running the Project
+
+### Requirements
+
+* Java 17 or later
+* Apache Maven
+
+### Run using Maven
+
+Compile the project:
+
+```bash
+mvn compile
+```
+
+Run the application:
+
+```bash
+mvn exec:java
+```
+
+### Run without Maven
 
 ```bash
 javac -d out src/main/java/*.java
 java -cp out Main
 ```
 
-With Maven:
+## Demo Accounts
 
-```bash
-mvn compile exec:java -Dexec.mainClass=Main
-```
+The application includes sample data for testing:
 
-Demo logins (sample data is seeded in `Main`):
+| ID | Role      | Name |
+| -- | --------- | ---- |
+| L1 | Librarian | Sara |
+| M1 | Member    | Ali  |
 
-- `L1` : Librarian (Sara)
-- `M1` : Member (Ali)
+You can also create new accounts through the sign-up option.
 
-To create a new account, pick your role and choose **Sign up**. The staff access code for librarian accounts is `LIB-2026` (change it in `Main.java`).
+**Note:** Librarian registration requires a staff access code defined in `Main.java`. The current demo code is `LIB-2026`.
 
-Try this: log in as `M1`, borrow books `101`, `102`, `103`, then try `104` and watch the borrow limit stop you.
+## Unit Testing
 
-## Running the tests
+The project includes **5 automated unit tests using JUnit 5**.
+
+The tests are organized into two test classes:
+
+### LibraryTest (4 tests)
+
+* `addedBookCanBeFoundByIsbn()` – Checks whether an added book can be retrieved using its ISBN.
+* `titleSearchFindsBook()` – Checks whether searching by title returns the correct book.
+* `issuingBookMakesItUnavailable()` – Checks whether issuing a book changes its availability and adds it to the member's borrowed books.
+* `returningBookMakesItAvailableAgain()` – Checks whether returning a book makes it available again and removes it from the member's borrowed books.
+
+### UserPolymorphismTest (1 test)
+
+* `eachSubclassReportsItsOwnRole()` – Checks whether Librarian and Member objects correctly report their respective roles through the `User` reference.
+
+### Run the tests
+
+Execute the following command:
 
 ```bash
 mvn test
 ```
 
-The JUnit 5 tests cover adding/removing books, case-insensitive search, auto-generated member and librarian IDs, issuing and returning, the borrow limit, unavailable books, defensive copies, and role polymorphism.
+## Possible Future Improvements
 
-## Possible improvements
-
-- `BorrowRecord` class with issue/due dates and fine calculation
-- Persistence (save books and members to a file or database)
-- Password-protected logins (right now anyone who knows an ID can log in as that user, and the staff code is hard-coded)
-- Python port of the same design to compare OOP styles
+* Add a `BorrowRecord` class to store issue dates, due dates, and calculate fines.
+* Implement file or database storage to preserve records between application runs.
+* Add password-protected authentication instead of ID-only login.
+* Improve account security by replacing the hard-coded staff access code.
